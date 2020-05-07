@@ -1,21 +1,23 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using NUnit.Framework;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace mantis_tests
 {
     [TestFixture]
-    public class AccountCreationTest : TestBase
+    public class AccountCreationTests : TestBase
     {
-        [TestFixtureSetUp]
+        [SetUp]
         public void setUpConfig()
         {
-            app.FTP.BackUpFile("/config_inc.php");
-            using (Stream localFile = File.Open("config_inc.php", FileMode.Open))
+            app.Ftp.BackupFile("/config_inc.php");
+            using (Stream localfile = File.Open("/config_inc.php", FileMode.Open))
             {
-                app.FTP.Upload("/config_inc.php", localFile);
+                app.Ftp.Upload("/config_inc.php", localfile);
             }
         }
 
@@ -24,28 +26,18 @@ namespace mantis_tests
         {
             AccountData account = new AccountData()
             {
-                Name = "test18",
-                Password = "test",
-                Email = "test18@localhost.localdomain"
+                Name = "testuser",
+                Password = "password",
+                Email = "testuser@localhost.localdomain"
             };
-
-            List<AccountData> accounts = app.Admin.GetAllAccounts();
-            AccountData existingAccount = accounts.Find(x => x.Name == account.Name);
-            if (existingAccount != null)
-            {
-                app.Admin.DeleteAccount(existingAccount);
-            }
-
-            app.James.Delete(account);
-            app.James.Add(account);
 
             app.Registration.Register(account);
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public void restoreConfig()
         {
-            app.FTP.RestoreBackUpFile("/config_inc.php");
+            app.Ftp.RestoreBackupFile("/config_inc.php");
         }
     }
 }

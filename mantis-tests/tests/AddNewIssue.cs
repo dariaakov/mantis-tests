@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace mantis_tests
 {
     [TestFixture]
-    class AddNewIssueTests : TestBase
+    public class AddNewIssueTests : TestBase
     {
         [Test]
         public void AddNewIssue()
@@ -18,10 +18,12 @@ namespace mantis_tests
                 Name = "administrator",
                 Password = "root"
             };
+
             ProjectData project = new ProjectData()
             {
                 Id = "1"
             };
+
             IssueData issue = new IssueData()
             {
                 Summary = "some short text",

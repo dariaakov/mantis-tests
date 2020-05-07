@@ -1,18 +1,16 @@
-﻿using System;
+﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace mantis_tests
 {
-    [TestFixture]
-    class ProjectCreationTests : AuthTestBase
+    public class ProjectRemovalTests : AuthTestBase
     {
         [Test]
-        public void ProjectCreationTest()
+        public void ProjectRemovalTest()
         {
             AccountData account = new AccountData()
             {
@@ -23,22 +21,21 @@ namespace mantis_tests
             ProjectData project = new ProjectData()
             {
                 Name = "qqq",
-                Description = "www"
             };
 
-            app.Projects.DeleteIfProjectExist(account, project);
+            app.Projects.CreateIfNoProjectsExists(account, project);
 
             List<ProjectData> oldProjects = app.Projects.GetProjectList(account);
 
-            app.Projects.Create(account, project);
+            ProjectData toBeRemoved = oldProjects[0];
 
-            Assert.AreEqual(oldProjects.Count + 1, app.Projects.GetProjectCount(account));
+            app.Projects.Remove(account, toBeRemoved.Id);
+
+            Assert.AreEqual(oldProjects.Count - 1, app.Projects.GetProjectCount(account));
 
             List<ProjectData> newProjects = app.Projects.GetProjectList(account);
 
-            oldProjects.Add(project);
-            oldProjects.Sort();
-            newProjects.Sort();
+            oldProjects.RemoveAt(0);
 
             Assert.AreEqual(oldProjects, newProjects);
         }

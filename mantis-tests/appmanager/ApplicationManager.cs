@@ -7,32 +7,42 @@ using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
+using System.Deployment.Internal;
 
 namespace mantis_tests
 {
-    public class ApplicationManager
+     public class ApplicationManager
     {
         protected IWebDriver driver;
-        protected StringBuilder verificationErrors;
-        private static ThreadLocal<ApplicationManager> app = new ThreadLocal<ApplicationManager>();
-        protected NavigationHelper navigationHelper;
-        protected LoginHelper loginHelper;
-        protected ProjectHelper projectHelper;
-        protected string baseUrl;
+        protected string baseURL;
 
-        private ApplicationManager()
+        public RegistrationHelper Registration { get; set; }
+
+        public FtpHelper Ftp { get; set; }
+
+        public ProjectManagementHelper Projects { get; set; }
+
+        public LoginHelper Auth { get; set; }
+
+        public ManagementMenuHelper Menu { get; private set; }
+
+        public NavigationHelper NavigateTo { get; private set; }
+
+        public APIHelper API { get; set; }
+
+        private static ThreadLocal<ApplicationManager> app = new ThreadLocal<ApplicationManager>();
+
+        public ApplicationManager()
         {
             driver = new FirefoxDriver();
-            baseUrl = "http://localhost/mantisbt-2.24.0";
-            verificationErrors = new StringBuilder();
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
+            baseURL = "https://localhost";
             Registration = new RegistrationHelper(this);
-            FTP = new FTPHelper(this);
-            James = new JamesHelper(this);
-            Mail = new MailHelper(this);
-            navigationHelper = new NavigationHelper(this);
-            loginHelper = new LoginHelper(this);
-            projectHelper = new ProjectHelper(this);
-            Admin = new AdminHelper(this, baseUrl);
+            Ftp = new FtpHelper(this);
+            Projects = new ProjectManagementHelper(this);
+            Auth = new LoginHelper(this);
+            Menu = new ManagementMenuHelper(this);
+            NavigateTo = new NavigationHelper(this, baseURL);
             API = new APIHelper(this);
         }
 
@@ -50,54 +60,21 @@ namespace mantis_tests
 
         public static ApplicationManager GetInstance()
         {
-            if (!app.IsValueCreated)
+            if (! app.IsValueCreated)
             {
-                ApplicationManager newInstasnce = new ApplicationManager();
-                newInstasnce.driver.Url = newInstasnce.baseUrl + "/login_page.php";
-                app.Value = newInstasnce;
+                ApplicationManager newInstance = new ApplicationManager();
+                newInstance.driver.Url = "https://localhost/mantisbt-2.24.0/mantisbt-2.24.0/login_page.php";
+                app.Value = newInstance;
             }
             return app.Value;
         }
 
-        public IWebDriver Driver
+
+        public IWebDriver Driver 
         {
             get
             {
                 return driver;
-            }
-        }
-
-        public RegistrationHelper Registration { get; set; }
-
-        public FTPHelper FTP { get; set; }
-
-        public JamesHelper James { get; set; }
-
-        public MailHelper Mail { get; set; }
-        public AdminHelper Admin { get; private set; }
-        internal APIHelper API { get; private set; }
-
-        public LoginHelper Auth
-        {
-            get
-            {
-                return loginHelper;
-            }
-        }
-
-        public NavigationHelper Navigator
-        {
-            get
-            {
-                return navigationHelper;
-            }
-        }
-
-        public ProjectHelper project
-        {
-            get
-            {
-                return projectHelper;
             }
         }
     }
